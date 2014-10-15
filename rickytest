@@ -18,59 +18,58 @@ The following is the app manifest for the continuing example of this article.
 ```
 
 
-**Note:**  If the domain changes between testing and staging or staging and production, you have to re-register the application in Azure AD and change domain in the manifest.
 
-
-## Cache the activation parameters
-<a name="sectionSection2"> </a>
-
-Your file handler is always invoked with either the  **openUrl** or **previewUrl**. In either case, Office 365 will include the activation parameters (see  [File Handler manifest and activation parameter reference](..\howto\howto-cross-suite-apps-manifest-reference.md)) as fields in a hidden form. These need to be cached. Moreover, the caching must happen immediately when the endpoint is called. This is because the first time a user opens the web application, the web application doesn't have an access token so it must redirect to Azure AD which will trigger the OAuth authorization code flow. At the end of that flow, the browser is redirected back to the original URL (open or preview). The activation parameters must be cached so that they are available after the redirections.
-
-
-**Note:**  Every file handler will use the  **Tenant** and the **FileGet** activation parameters. If file handler supports editing and saving, the **FilePut** parameter is also used. The others may or may not be used based on the needs of the previewing or editing application.
-
-
-## Create the file preview function
-<a name="sectionSection3"> </a>
-
-Create the file preview function and URL. This can be any web endpoint that hosts code to return the preview image, including a web method, a controller method, or a page. The code should do the following:
-
-
-1. Check for the activation parameters in the form fields and cache them if they are there. If they are not there, then that means the preview URL was not called from within Office 365. It is probably a redirect from AAD in which case the parameters should be in the cache. (Consider having your code verify at this point that they are in the cache. If they are not, something has gone badly wrong and your code can send an error page to the user. Suppose, for example, the user earlier added the preview URL for the file to her browser favorites. If she has now launched the web application from the favorites, there may not be activation parameters in either a form or the cache, depending on the type of cache that is used.)
-    
-    The following is an example of this logic in C# as part of a ASP.NET MVC controller action method.
-
-        ```cs
-        Code here
-        ```
-
-2. Check for an unexpired cached access token and get one if there isn't one in the cache. Be sure to cache the activation parameters before you start the OAuth authentication code flow. For more information about access token handing and sample code, see  [Create Office 365 cross-suite apps](..\howto\howto-create-apps.md).
-    
-3. Create an HTTP GET request to the URL of the cached  **FileGet** activation parameter. Include the access token as an Authorization header with the value "Bearer *&lt;access_token&gt;*. 
-    
-4. Get the content of the file from the response to the request. The following shows the last two steps:
+HTML
 
 ```html
-        Code here
-```
+<h3>Email/blog</h3>
+	<ul>
+		<li><a href="https://outlook.com/microsoft.com">Microsoft Outlook Web Access</a></li>
+		<li><a href="https://login.microsoftonline.com/login.srf?wa=wsignin1%2E0&amp;rpsnv=2&amp;ct=1366076511&amp;rver=6%2E1%2E6206%2E0&amp;wp=MBI&amp;wreply=https%3A%2F%2Fmicrosoft%2Dmy%2Esharepoint%2Ecom%2F%5Fforms%2Fdefault%2Easpx&amp;lc=1033&amp;id=500046&amp;guests=1">Outlook.com</a></li>
+		<li><a href="http://dashboard.bloglines.com/privatepage/1">Bloglines</a></li>
+        <li><a href="https://mail.google.com/mail/#inbox">gmail</a></li>
+	</ul>
+	<h3>Banking</h3>
+	<ul>
+		<li><a href="https://online.firsttechfed.com/hb">1stTech HomeBanking</a> </li>
+		<li><a href="http://www.ebay.com">ebay</a></li>
+		<li><a href="http://www.mint.com">Mint</a></li>
+		<li><a href="http://www.paypal.com">paypal</a></li>
+	</ul>
+	```
+	
+	C# goes here:
 
-5. Using the content of the file, construct a preview.
-    
-6. Send the preview to the user's browser.
-    
-
-## Create the file open function
-<a name="sectionSection4"> </a>
-
-Create the file open function and URL. This can be any web endpoint that hosts code to open the file in the editing application, including a web method, a controller method, or a page. The code should do the following:
 
 
-1. The same first 4 steps as in the preview function. 
-    
-2. Open the content file in the editing application. The following is an example. The first code snippet passes the file contents to a view in MVC.
+```cs
+class Program
+    {
+        static void Main(string[] args)
+        {
+            //Load xml
+            XDocument xdoc = XDocument.Load(@"c:\users\franla\documents\visual studio 2012\Projects\ConsoleApplication1\ConsoleApplication1\data.xml");
 
- ```cs
-        Code here
+            //Run query
+            var lv1s = from lv1 in xdoc.Descendants("level1")
+                       select new
+                       {
+                           Header = lv1.Attribute("name").Value,
+                           Children = lv1.Descendants("level2")
+                       };
+
+            //Loop through results
+            StringBuilder result = new StringBuilder(); 
+            foreach (var lv1 in lv1s)
+            {
+                result.AppendLine(lv1.Header);
+                foreach (var lv2 in lv1.Children)
+                    result.AppendLine("     " + lv2.Attribute("name").Value);
+            }
+            Console.Write(result);
+        
+        }
+    }
 ```
 
 
