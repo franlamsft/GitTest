@@ -1,6 +1,26 @@
-URL start here
-```
-https://github.com/
+html start here
+```html
+	<h3>Other</h3>
+	<ul>
+		<li><a href="http://babel.altavista.com/tr">Babel Fish Translation Service</a></li>
+		<li><a href="http://www.loc.gov/poetry/180/">Poetry 180 - Home Page</a>
+		</li>
+		<li>
+		<a href="http://seattletimes.nwsource.com/flatpages/sports/sports/tvradiolistings.html?from=stnvs2">
+		Seattle Times Sports TV-Radio</a></li>
+		<li><a href="http://www.summitatsnoqualmie.com/">Snoqualmie Summit</a></li>
+		<li><a href="http://www.totalimmersion.net/">Total Immersion Swimming</a>
+		</li>
+		<li><a href="http://www.uscollegehockey.com/">U.S. College Hockey Online</a>
+		</li>
+	</ul>
+	<h3>Pictures</h3>
+	<ul>
+		<li><a href="http://www.flickr.com">Flickr</a></li>
+		<li><a href="http://www.shutterfly.com">shutterfly</a></li>
+		<li><a href="photos.htm">Photos</a></li>
+	</ul>
+
 ```
 Ends here
 
