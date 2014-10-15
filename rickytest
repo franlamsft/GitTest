@@ -1,0 +1,76 @@
+The following is the app manifest for the continuing example of this article.
+
+
+```json
+{
+  "extensions": [
+        {
+            "type": "FileHandler",
+            "properties": {
+                "extension": "drw",
+                "fileIcon": "https://fabrikam.com/images/fileicon.png",
+                "openUrl": "https://fabrikam.com/CADFileHandler/index",
+                "previewUrl": "https://fabrikam.com/CADFileHandler/preview"
+            }
+        }
+    ]
+}
+```
+
+
+**Note:**  If the domain changes between testing and staging or staging and production, you have to re-register the application in Azure AD and change domain in the manifest.
+
+
+## Cache the activation parameters
+<a name="sectionSection2"> </a>
+
+Your file handler is always invoked with either the  **openUrl** or **previewUrl**. In either case, Office 365 will include the activation parameters (see  [File Handler manifest and activation parameter reference](..\howto\howto-cross-suite-apps-manifest-reference.md)) as fields in a hidden form. These need to be cached. Moreover, the caching must happen immediately when the endpoint is called. This is because the first time a user opens the web application, the web application doesn't have an access token so it must redirect to Azure AD which will trigger the OAuth authorization code flow. At the end of that flow, the browser is redirected back to the original URL (open or preview). The activation parameters must be cached so that they are available after the redirections.
+
+
+**Note:**  Every file handler will use the  **Tenant** and the **FileGet** activation parameters. If file handler supports editing and saving, the **FilePut** parameter is also used. The others may or may not be used based on the needs of the previewing or editing application.
+
+
+## Create the file preview function
+<a name="sectionSection3"> </a>
+
+Create the file preview function and URL. This can be any web endpoint that hosts code to return the preview image, including a web method, a controller method, or a page. The code should do the following:
+
+
+1. Check for the activation parameters in the form fields and cache them if they are there. If they are not there, then that means the preview URL was not called from within Office 365. It is probably a redirect from AAD in which case the parameters should be in the cache. (Consider having your code verify at this point that they are in the cache. If they are not, something has gone badly wrong and your code can send an error page to the user. Suppose, for example, the user earlier added the preview URL for the file to her browser favorites. If she has now launched the web application from the favorites, there may not be activation parameters in either a form or the cache, depending on the type of cache that is used.)
+    
+    The following is an example of this logic in C# as part of a ASP.NET MVC controller action method.
+
+        ```cs
+        Code here
+        ```
+
+2. Check for an unexpired cached access token and get one if there isn't one in the cache. Be sure to cache the activation parameters before you start the OAuth authentication code flow. For more information about access token handing and sample code, see  [Create Office 365 cross-suite apps](..\howto\howto-create-apps.md).
+    
+3. Create an HTTP GET request to the URL of the cached  **FileGet** activation parameter. Include the access token as an Authorization header with the value "Bearer *&lt;access_token&gt;*. 
+    
+4. Get the content of the file from the response to the request. The following shows the last two steps:
+
+```html
+        Code here
+```
+
+5. Using the content of the file, construct a preview.
+    
+6. Send the preview to the user's browser.
+    
+
+## Create the file open function
+<a name="sectionSection4"> </a>
+
+Create the file open function and URL. This can be any web endpoint that hosts code to open the file in the editing application, including a web method, a controller method, or a page. The code should do the following:
+
+
+1. The same first 4 steps as in the preview function. 
+    
+2. Open the content file in the editing application. The following is an example. The first code snippet passes the file contents to a view in MVC.
+
+ ```cs
+        Code here
+```
+
+
