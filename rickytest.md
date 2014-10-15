@@ -42,7 +42,8 @@ HTML
 
 
 
-```cs
+```C#
+
 class Program
     {
         static void Main(string[] args)
