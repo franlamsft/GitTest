@@ -1,6 +1,6 @@
 The following is the app manifest for the continuing example of this article.
 
-
+json code block
 ```json
 {
   "extensions": [
@@ -19,8 +19,7 @@ The following is the app manifest for the continuing example of this article.
 
 
 
-HTML
-
+HTML code block
 ```html
 <h3>Email/blog</h3>
 	<ul>
@@ -38,10 +37,7 @@ HTML
 	</ul>
 ```
 	
-	C# goes here:
-
-
-
+C# code block
 ```cs
 
 class Program
